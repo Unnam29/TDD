@@ -15,7 +15,7 @@ jobs:
 
       - run:
           name: "Run Tests"
-          command: pytest
+          command: pytest test.py
 
       - setup_remote_docker
 
