@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.8 
+    steps:
+      - checkout
+      - run:
+          name: Set up a virtual environment
+          command: python -m venv venv && . venv/bin/activate
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: Run tests with pytest
+          command: pytest test.py  
+
+workflows:
+  version: 2
+  build-and-test-workflow:
+    jobs:
+      - build-and-test
