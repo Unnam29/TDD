@@ -1,20 +1,45 @@
 version: 2.1
 
 jobs:
-  build-and-test:
+  build and push to dockerhub:
     docker:
-      - image: cimg/python:3.8 
+      - image: cimg/python:3.8
     steps:
       - checkout
+
       - run:
-          name: Install dependencies
-          command: pip install -r requirements.txt
+          name: "Install Dependencies"
+          command: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
       - run:
-          name: Run tests with pytest
-          command: pytest test.py  
+          name: "Run Tests"
+          command: pytest
+
+      - setup_remote_docker
+
+      - run:
+          name: "Build Docker Image"
+          command: |
+            docker build -t unnam29/sparse_recommender:latest .
+
+      - run:
+          name: "Push Docker Image"
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+
+      - run:
+          name: Push Docker Image to Docker Hub
+          command: |
+            docker push unnam29/sparse_recommender:latest
 
 workflows:
-  version: 2
-  build-and-test-workflow:
+  version: 2.1
+  build-and-deploy:
     jobs:
-      - build-and-test
+      - build and push to dockerhub:
+          filters:
+            branches:
+              only:
+                - main
